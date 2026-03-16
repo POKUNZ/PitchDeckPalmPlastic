@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PalmPlastic — Pitch Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --g0:#050e07; --g1:#0a1a0c; --g2:#122015; --g3:#1d3320;
+  --gm:#2d5c35; --gb:#4a9e58; --gl:#8fd49a; --gp:#c8eacc;
+  --cream:#f0ece0; --amber:#c8860a; --rust:#b85a2a;
+  --r: 255; --g: 255; --b: 255;
+}
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Outfit',sans-serif;
+  background:var(--g0);
+  color:var(--cream);
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CUSTOM CURSOR ── */
+#cursor {
+  position:fixed; width:12px; height:12px; border-radius:50%;
+  background:var(--gb); pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%); transition:transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+  mix-blend-mode:exclusion;
+}
+#cursor-ring {
+  position:fixed; width:40px; height:40px; border-radius:50%;
+  border:1px solid rgba(143,212,154,0.5); pointer-events:none; z-index:9998;
+  transform:translate(-50%,-50%); transition:transform 0.15s ease-out, width 0.3s, height 0.3s;
+}
+body:hover #cursor { opacity:1; }
+
+/* ── CANVAS BG ── */
+#bgCanvas {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+}
+
+/* ── GRAIN OVERLAY ── */
+.grain {
+  position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1.2rem 3.5rem;
+  background:rgba(5,14,7,0.7);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(143,212,154,0.1);
+}
+.nav-logo {
+  font-family:'Playfair Display',serif; font-size:1.15rem;
+  color:var(--gl); letter-spacing:0.03em; display:flex; align-items:center; gap:10px;
+}
+.nav-logo-dot {
+  width:8px; height:8px; border-radius:50%; background:var(--gb);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(74,158,88,0.4)} 50%{box-shadow:0 0 0 8px rgba(74,158,88,0)} }
+.nav-progress {
+  position:absolute; bottom:0; left:0; height:2px;
+  background:linear-gradient(90deg,var(--gb),var(--gl));
+  transition:width 0.4s ease; width:0%;
+}
+.nav-dots { display:flex; gap:12px; align-items:center; }
+.nav-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(143,212,154,0.25); cursor:none;
+  transition:all 0.4s; position:relative;
+}
+.nav-dot::after {
+  content:''; position:absolute; inset:-4px; border-radius:50%;
+  border:1px solid transparent; transition:border-color 0.3s;
+}
+.nav-dot.active { background:var(--gl); transform:scale(1.5); }
+.nav-dot.active::after { border-color:rgba(143,212,154,0.4); }
+.nav-slide-num {
+  font-size:0.7rem; letter-spacing:0.15em; color:rgba(143,212,154,0.4);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── SLIDES ── */
+.slide {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:7rem 5rem 5rem; position:relative; z-index:2;
+}
+.slide-inner { max-width:1200px; width:100%; position:relative; }
+
+/* ── SHARED ANIMATED BG ELEMENTS ── */
+.orb {
+  position:absolute; border-radius:50%; pointer-events:none; filter:blur(80px);
+  animation:orbFloat 8s ease-in-out infinite;
+}
+@keyframes orbFloat {
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(20px,-30px) scale(1.05)}
+  66%{transform:translate(-15px,20px) scale(0.95)}
+}
+.geo-lines {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden; opacity:0.07;
+}
+
+/* ── SLIDE 1 HERO ── */
+#s1 { background:var(--g0); }
+.hero-leaf-bg {
+  position:absolute; right:-5%; top:-10%; width:55%; opacity:0.06;
+  pointer-events:none;
+}
+.hero-grid-line {
+  position:absolute; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(143,212,154,0.15),transparent);
+  pointer-events:none;
+}
+.eyebrow {
+  font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase;
+  color:var(--gb); margin-bottom:1.8rem; opacity:0;
+  display:flex; align-items:center; gap:10px;
+}
+.eyebrow::before { content:''; width:30px; height:1px; background:var(--gb); }
+.hero-title {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(5rem,10vw,9.5rem);
+  line-height:0.9; margin-bottom:1.5rem; overflow:hidden;
+}
+.hero-title .line { display:block; overflow:hidden; }
+.hero-title .word { display:inline-block; transform:translateY(115%); }
+.hero-title .italic { font-style:italic; color:var(--gl); }
+.hero-desc {
+  font-size:1.05rem; color:rgba(200,234,204,0.75); font-weight:300;
+  max-width:480px; line-height:1.8; margin-bottom:2.5rem; opacity:0;
+}
+.hero-cta {
+  display:inline-flex; align-items:center; gap:12px;
+  padding:1rem 2rem; background:var(--gm);
+  border:1px solid rgba(143,212,154,0.3); border-radius:999px;
+  color:var(--gl); font-size:0.9rem; cursor:none;
+  transition:all 0.4s; opacity:0; position:relative; overflow:hidden;
+}
+.hero-cta::before {
+  content:''; position:absolute; inset:0; background:rgba(143,212,154,0.1);
+  transform:scaleX(0); transform-origin:left; transition:transform 0.4s;
+}
+.hero-cta:hover::before { transform:scaleX(1); }
+.hero-cta:hover { border-color:var(--gl); transform:translateY(-2px); }
+.hero-cta-arrow { transition:transform 0.3s; }
+.hero-cta:hover .hero-cta-arrow { transform:translateX(5px); }
+.hero-stats {
+  position:absolute; right:0; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; gap:2rem; opacity:0;
+}
+.hero-stat-item { text-align:right; }
+.hero-stat-num {
+  font-family:'Playfair Display',serif; font-size:2.8rem;
+  color:var(--gl); line-height:1;
+}
+.hero-stat-label { font-size:0.72rem; color:rgba(143,212,154,0.5); letter-spacing:0.1em; }
+
+/* ── SLIDE 2 PROBLEM ── */
+#s2 { background:linear-gradient(160deg,#07110a 0%,#0d1e10 100%); }
+.problem-headline {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,7vw,6.5rem);
+  line-height:1; margin-bottom:3rem; opacity:0;
+}
+.problem-headline em { font-style:italic; color:var(--gl); }
+.prob-cards {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2rem;
+}
+.prob-card {
+  border:1px solid rgba(143,212,154,0.15); border-radius:20px;
+  padding:2.2rem 2rem; position:relative; overflow:hidden;
+  opacity:0; transform:translateY(50px);
+  transition:border-color 0.4s, transform 0.3s;
+  background:rgba(143,212,154,0.03);
+}
+.prob-card::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(74,158,88,0.1),transparent 60%);
+  opacity:0; transition:opacity 0.4s;
+}
+.prob-card:hover { border-color:rgba(143,212,154,0.4); transform:translateY(-4px) !important; }
+.prob-card:hover::before { opacity:1; }
+.prob-card-num {
+  font-family:'Playfair Display',serif; font-size:3.5rem;
+  color:var(--gb); font-weight:700; margin-bottom:0.5rem; line-height:1;
+}
+.prob-card-unit { font-size:1.2rem; color:var(--gl); }
+.prob-card-text { font-size:0.88rem; color:rgba(200,234,204,0.65); line-height:1.7; margin-top:0.8rem; }
+.prob-card-icon {
+  position:absolute; top:1.5rem; right:1.5rem;
+  font-size:1.8rem; opacity:0.4;
+}
+
+/* ── SLIDE 3 SOLUTION ── */
+#s3 { background:linear-gradient(135deg,#0f1f12 0%,#1a3520 50%,#0d1a10 100%); overflow:visible; }
+.sol-label { font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gb); margin-bottom:1.2rem; opacity:0; }
+.sol-title {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,3.2rem);
+  line-height:1.05; max-width:700px; margin-bottom:2.5rem; opacity:0;
+}
+.sol-title em { font-style:italic; color:var(--gl); }
+.flow-wrap { display:flex; align-items:flex-start; position:relative; padding-bottom:180px; }
+.flow-connector {
+  position:absolute; top:40px; left:calc(12.5% + 30px); right:calc(12.5% + 30px);
+  height:1px; background:linear-gradient(90deg,var(--gb),var(--gl),var(--gb));
+  opacity:0; transform:scaleX(0); transform-origin:left;
+}
+.flow-node {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  text-align:center; padding:0 0.8rem; opacity:0; position:relative; z-index:1;
+}
+.flow-icon-wrap {
+  width:72px; height:72px; border-radius:50%;
+  border:2px solid rgba(143,212,154,0.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.8rem; margin-bottom:1rem; position:relative;
+  background:rgba(45,92,53,0.5); backdrop-filter:blur(10px);
+  transition:all 0.4s; cursor:none;
+}
+.flow-icon-wrap::after {
+  content:''; position:absolute; inset:-6px; border-radius:50%;
+  border:1px solid rgba(143,212,154,0.15); transition:all 0.4s;
+}
+.flow-node:hover .flow-icon-wrap {
+  border-color:var(--gl); background:rgba(74,158,88,0.3);
+  transform:translateY(-8px) scale(1.08);
+}
+.flow-node:hover .flow-icon-wrap::after { inset:-12px; opacity:0.5; }
+.flow-node h4 { font-size:0.85rem; font-weight:500; color:var(--cream); margin-bottom:0.4rem; }
+.flow-node p { font-size:0.75rem; color:rgba(200,234,204,0.55); line-height:1.6; }
+.flow-tooltip {
+  position:absolute; top:calc(100% + 14px); left:50%; transform:translateX(-50%) translateY(8px);
+  background:rgba(20,50,28,0.97); border:1px solid rgba(143,212,154,0.25);
+  border-radius:12px; padding:1rem; width:190px; font-size:0.76rem;
+  color:var(--gp); line-height:1.6; opacity:0; pointer-events:none;
+  transition:all 0.3s; backdrop-filter:blur(12px); z-index:50;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+.flow-node:hover .flow-tooltip { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── SLIDE 4 MARKET ── */
+#s4 { background:var(--g0); }
+.mkt-layout { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+.mkt-left-title {
+  font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4.5rem);
+  line-height:1.05; margin-bottom:2rem; opacity:0;
+}
+.mkt-left-title em { font-style:italic; color:var(--gl); }
+.mkt-big-num {
+  font-family:'Playfair Display',serif; font-size:clamp(4rem,8vw,7rem);
+  color:var(--gl); line-height:1; opacity:0;
+  display:flex; align-items:baseline; gap:0.2em;
+}
+.mkt-big-num .unit { font-size:0.4em; color:var(--gb); font-style:italic; }
+.mkt-big-label { font-size:0.82rem; color:rgba(143,212,154,0.5); margin-bottom:2.5rem; opacity:0; }
+.mkt-cagr { display:flex; gap:2rem; margin-top:1.5rem; opacity:0; }
+.mkt-cagr-item { }
+.mkt-cagr-num { font-family:'Playfair Display',serif; font-size:2rem; color:var(--cream); }
+.mkt-cagr-label { font-size:0.72rem; color:rgba(143,212,154,0.5); }
+.mkt-right { opacity:0; }
+.mkt-bar-group { margin-bottom:1.8rem; }
+.mkt-bar-title { font-size:0.82rem; color:var(--gp); margin-bottom:0.6rem; display:flex; justify-content:space-between; }
+.mkt-bar-track { height:10px; background:rgba(143,212,154,0.1); border-radius:5px; overflow:hidden; position:relative; }
+.mkt-bar-fill { height:100%; border-radius:5px; position:relative; width:0%; }
+.mkt-bar-fill::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); animation:shimmer 2s infinite; }
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.mkt-bar-fill.primary { background:linear-gradient(90deg,var(--gb),var(--gl)); }
+.mkt-bar-fill.warn { background:linear-gradient(90deg,var(--amber),#f0b840); }
+
+/* ── SLIDE 5 COMPETITION ── */
+#s5 { background:linear-gradient(160deg,#040d06 0%,#0a1a0c 100%); }
+.comp-intro { display:grid; grid-template-columns:1fr 1fr; gap:4rem; margin-bottom:3rem; }
+.comp-main-title {
+  font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4.5rem);
+  line-height:1.05; opacity:0;
+}
+.comp-main-title em { font-style:italic; color:var(--gl); }
+.comp-insight { font-size:0.92rem; color:rgba(143,212,154,0.65); line-height:1.8; opacity:0; padding-top:1rem; }
+.comp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.comp-card {
+  border-radius:20px; padding:2rem; position:relative; overflow:hidden;
+  opacity:0; transform:translateY(40px); transition:transform 0.3s;
+  cursor:none;
+}
+.comp-card:hover { transform:translateY(-6px) !important; }
+.comp-card.us {
+  background:linear-gradient(135deg,rgba(45,92,53,0.8),rgba(29,51,32,0.8));
+  border:1.5px solid rgba(143,212,154,0.4);
+}
+.comp-card.us::before {
+  content:'OUR ADVANTAGE'; position:absolute; top:14px; right:14px;
+  font-size:0.6rem; letter-spacing:0.15em; padding:4px 10px;
+  background:var(--gb); color:white; border-radius:999px;
+}
+.comp-card.other {
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(143,212,154,0.1);
+}
+.comp-name { font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:0.3rem; }
+.comp-origin { font-size:0.72rem; color:rgba(143,212,154,0.45); letter-spacing:0.1em; margin-bottom:1.2rem; text-transform:uppercase; }
+.comp-attr-row { display:flex; gap:1rem; margin-top:1.2rem; padding-top:1.2rem; border-top:1px solid rgba(143,212,154,0.1); flex-wrap:wrap; }
+.comp-attr { font-size:0.75rem; }
+.comp-attr-key { color:rgba(143,212,154,0.4); display:block; margin-bottom:2px; font-size:0.68rem; }
+.comp-attr-val { color:var(--cream); }
+.comp-desc { font-size:0.82rem; color:rgba(200,234,204,0.6); line-height:1.65; }
+.advantage-badge {
+  display:inline-block; padding:4px 12px; border-radius:999px;
+  background:rgba(74,158,88,0.2); color:var(--gl);
+  font-size:0.72rem; margin-bottom:1rem; border:1px solid rgba(74,158,88,0.3);
+}
+
+/* ── SLIDE 6 BIZ MODEL ── */
+#s6 { background:linear-gradient(135deg,#081009 0%,#132318 100%); }
+.biz-header { margin-bottom:3.5rem; }
+.biz-main-title {
+  font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4.5rem);
+  line-height:1.05; opacity:0;
+}
+.biz-main-title em { font-style:italic; color:var(--gl); }
+.biz-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.biz-card {
+  border-radius:20px; padding:2.5rem 2rem;
+  border:1px solid rgba(143,212,154,0.15);
+  background:rgba(143,212,154,0.03);
+  opacity:0; transform:translateY(50px);
+  position:relative; overflow:hidden; transition:all 0.4s; cursor:none;
+}
+.biz-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,var(--gb),var(--gl));
+  transform:scaleX(0); transform-origin:left; transition:transform 0.5s ease;
+}
+.biz-card:hover { border-color:rgba(143,212,154,0.35); transform:translateY(-8px) !important; }
+.biz-card:hover::after { transform:scaleX(1); }
+.biz-card.featured {
+  border-color:rgba(143,212,154,0.35);
+  background:linear-gradient(135deg,rgba(45,92,53,0.4),rgba(29,51,32,0.4));
+}
+.biz-phase { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--gb); margin-bottom:1.5rem; }
+.biz-name { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--cream); margin-bottom:0.5rem; }
+.biz-rev { font-size:2.2rem; font-weight:500; color:var(--gl); line-height:1.1; margin-bottom:0.2rem; }
+.biz-rev-label { font-size:0.72rem; color:rgba(143,212,154,0.4); margin-bottom:1.5rem; }
+.biz-desc { font-size:0.83rem; color:rgba(200,234,204,0.6); line-height:1.7; }
+.biz-hover-detail {
+  position:absolute; inset:0; border-radius:20px; padding:2rem;
+  background:rgba(29,51,32,0.97); opacity:0; transition:opacity 0.4s;
+  display:flex; flex-direction:column; justify-content:center; gap:1rem;
+  pointer-events:none;
+}
+.biz-card:hover .biz-hover-detail { opacity:1; }
+.biz-detail-item { display:flex; gap:0.8rem; align-items:flex-start; }
+.biz-detail-dot { width:6px; height:6px; border-radius:50%; background:var(--gb); margin-top:0.4rem; flex-shrink:0; }
+.biz-detail-text { font-size:0.83rem; color:var(--gp); line-height:1.6; }
+
+/* ── SLIDE 7 FINANCIALS ── */
+#s7 { background:var(--g0); }
+.fin-header { margin-bottom:3rem; }
+.fin-title {
+  font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4.5rem);
+  line-height:1.05; opacity:0;
+}
+.fin-title em { font-style:italic; color:var(--gl); }
+.fin-layout { display:grid; grid-template-columns:1fr 1.4fr; gap:4rem; align-items:start; }
+.fin-metrics { display:flex; flex-direction:column; gap:1.5rem; }
+.fin-metric {
+  border:1px solid rgba(143,212,154,0.12); border-radius:16px;
+  padding:1.5rem 1.8rem; background:rgba(143,212,154,0.03);
+  opacity:0; transform:translateX(-30px); transition:all 0.3s;
+}
+.fin-metric:hover { border-color:rgba(143,212,154,0.3); transform:translateX(4px) !important; }
+.fin-metric-amount { font-family:'Playfair Display',serif; font-size:2.5rem; color:var(--gl); line-height:1; }
+.fin-metric-label { font-size:0.78rem; color:rgba(143,212,154,0.45); margin-top:0.3rem; }
+.fin-alloc { opacity:0; }
+.fin-alloc-title { font-size:0.82rem; color:rgba(143,212,154,0.5); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:2rem; }
+.fin-alloc-row { margin-bottom:1.5rem; }
+.fin-alloc-head { display:flex; justify-content:space-between; margin-bottom:0.5rem; }
+.fin-alloc-name { font-size:0.88rem; color:var(--gp); }
+.fin-alloc-pct { font-size:0.88rem; color:var(--gb); font-family:'Playfair Display',serif; }
+.fin-alloc-track { height:8px; background:rgba(143,212,154,0.08); border-radius:4px; overflow:hidden; }
+.fin-alloc-bar {
+  height:100%; border-radius:4px; width:0%;
+  background:linear-gradient(90deg,var(--gb),var(--gl));
+  transition:width 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.fin-timeline { margin-top:3rem; display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; opacity:0; }
+.fin-phase {
+  border-radius:16px; padding:1.5rem;
+  background:rgba(143,212,154,0.04);
+  border:1px solid rgba(143,212,154,0.1);
+  transition:all 0.3s; cursor:none;
+}
+.fin-phase:hover { border-color:rgba(143,212,154,0.3); background:rgba(143,212,154,0.08); }
+.fin-phase-label { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.15em; color:var(--gb); margin-bottom:0.5rem; }
+.fin-phase-name { font-size:0.9rem; font-weight:500; color:var(--cream); margin-bottom:0.3rem; }
+.fin-phase-cost { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--gl); }
+
+/* ── SLIDE 8 CLOSE ── */
+#s8 { background:var(--g0); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+.close-wrap { text-align:center; max-width:900px; margin:auto; }
+.close-tag { font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--gb); margin-bottom:2.5rem; opacity:0; display:inline-flex; align-items:center; gap:10px; }
+.close-tag::before, .close-tag::after { content:''; width:25px; height:1px; background:var(--gb); }
+.close-title {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(4rem,9vw,8.5rem);
+  line-height:0.9; margin-bottom:2.5rem; overflow:hidden;
+}
+.close-title .line { display:block; overflow:hidden; }
+.close-title .word { display:inline-block; transform:translateY(115%); }
+.close-title .green { color:var(--gl); font-style:italic; }
+.close-sub { font-size:1rem; color:rgba(200,234,204,0.6); line-height:1.8; max-width:560px; margin:0 auto 3rem; opacity:0; }
+.close-badges { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; opacity:0; }
+.close-badge {
+  padding:0.7rem 1.5rem; border:1px solid rgba(143,212,154,0.25);
+  border-radius:999px; font-size:0.8rem; color:var(--gl);
+  background:rgba(143,212,154,0.05); transition:all 0.3s; cursor:none;
+}
+.close-badge:hover { background:rgba(143,212,154,0.12); border-color:rgba(143,212,154,0.5); transform:translateY(-2px); }
+
+/* ── SECTION LABEL ── */
+.sec-label {
+  font-size:0.7rem; letter-spacing:0.25em; text-transform:uppercase;
+  color:var(--gb); margin-bottom:2.5rem; opacity:0;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-label::before { content:''; width:25px; height:1px; background:var(--gb); flex-shrink:0; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px) {
+  .slide { padding:6rem 1.8rem 4rem; }
+  nav { padding:1rem 1.8rem; }
+  .prob-cards,.comp-grid,.biz-cards,.fin-layout { grid-template-columns:1fr; }
+  .mkt-layout,.comp-intro { grid-template-columns:1fr; gap:2rem; }
+  .fin-layout { grid-template-columns:1fr; }
+  .hero-stats { display:none; }
+  .flow-wrap { flex-direction:column; gap:1.5rem; }
+  .flow-connector { display:none; }
+  #cursor,#cursor-ring { display:none; }
+  body { cursor:auto; }
+}
+
+/* ══ SLIDE: MACHINE 3D (Three.js) ══════════════════════════════════════ */
+.mach-layout {
+  display:grid; grid-template-columns:1fr 1.5fr; gap:3rem; align-items:center;
+}
+.mach-title {
+  font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3.5vw,2.8rem);
+  line-height:1.05; margin-bottom:0.4rem; opacity:0;
+}
+.mach-title em { font-style:italic; color:var(--gl); }
+.mach-sub { font-size:0.82rem; color:rgba(143,212,154,0.45); letter-spacing:0.06em; margin-bottom:1.5rem; opacity:0; }
+.mach-specs {
+  display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-bottom:1.5rem; opacity:0;
+}
+.mach-spec-item {
+  background:rgba(143,212,154,0.05); border:1px solid rgba(143,212,154,0.12);
+  border-radius:10px; padding:0.8rem 1rem;
+}
+.mach-spec-val { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--gl); display:block; }
+.mach-spec-key { font-size:0.68rem; color:rgba(143,212,154,0.45); text-transform:uppercase; letter-spacing:0.08em; }
+.mach-parts-list { display:flex; flex-direction:column; gap:0.5rem; opacity:0; }
+.mach-part-row {
+  display:flex; align-items:center; gap:10px; font-size:0.83rem; color:rgba(200,234,204,0.6);
+  padding:0.55rem 1rem; border-radius:8px; border:1px solid transparent;
+  transition:all 0.3s; cursor:none;
+}
+.mach-part-row:hover, .mach-part-row.active {
+  color:var(--gl); background:rgba(143,212,154,0.07); border-color:rgba(143,212,154,0.2);
+}
+.mach-part-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--gb); flex-shrink:0;
+  transition:transform 0.3s, background 0.3s;
+}
+.mach-part-row.active .mach-part-dot { transform:scale(1.6); background:var(--gl); }
+
+/* Three.js canvas */
+.mach-3d-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:0.6rem; opacity:0;
+  position:relative;
+}
+#machCanvas {
+  width:100% !important; height:380px !important;
+  border-radius:16px;
+  border:1px solid rgba(143,212,154,0.1);
+  background:transparent;
+  cursor:grab;
+}
+#machCanvas:active { cursor:grabbing; }
+.mach-rotate-hint {
+  font-size:0.67rem; color:rgba(143,212,154,0.28); letter-spacing:0.1em;
+}
+
+@media(max-width:900px) {
+  .mach-layout { grid-template-columns:1fr; }
+  #machCanvas { height:260px !important; }
+}
+
+
+/* ══ IDEATION ══ */
+.idea-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:4rem; align-items:center; }
+.idea-title { font-family:'Playfair Display',serif; font-size:clamp(2.5rem,5vw,4rem); line-height:1.05; margin-bottom:1.2rem; opacity:0; }
+.idea-title em { font-style:italic; color:var(--gl); }
+.idea-desc { font-size:0.9rem; color:rgba(200,234,204,0.6); line-height:1.8; opacity:0; }
+.idea-right { display:flex; flex-direction:column; gap:0; opacity:0; }
+.idea-card { display:flex; gap:1.2rem; align-items:flex-start; background:rgba(143,212,154,0.04); border:1px solid rgba(143,212,154,0.12); border-radius:14px; padding:1.2rem 1.4rem; transition:border-color 0.3s, transform 0.3s; }
+.idea-card:hover { border-color:rgba(143,212,154,0.3); transform:translateX(6px); }
+.idea-card-icon { font-size:1.6rem; flex-shrink:0; line-height:1; }
+.idea-card-title { font-size:0.78rem; font-weight:500; color:var(--gl); margin-bottom:0.25rem; text-transform:uppercase; letter-spacing:0.06em; }
+.idea-card-text { font-size:0.8rem; color:rgba(200,234,204,0.6); line-height:1.65; }
+.idea-arrow { text-align:center; font-size:1rem; color:rgba(143,212,154,0.25); padding:0.2rem 0; }
+
+/* ══ IMPACT ══ */
+.impact-title { font-family:'Playfair Display',serif; font-size:clamp(2.2rem,4.5vw,3.8rem); line-height:1.05; margin-bottom:2.5rem; opacity:0; }
+.impact-title em { font-style:italic; color:var(--gl); }
+.impact-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2rem; }
+.impact-card { background:rgba(143,212,154,0.04); border:1px solid rgba(143,212,154,0.12); border-radius:20px; padding:2rem 1.5rem; text-align:center; opacity:0; transform:translateY(40px); transition:all 0.3s; }
+.impact-card:hover { border-color:rgba(143,212,154,0.3); transform:translateY(-4px) !important; }
+.impact-icon { font-size:2rem; margin-bottom:1rem; }
+.impact-num { font-family:'Playfair Display',serif; font-size:3rem; color:var(--gl); line-height:1; font-weight:700; }
+.impact-unit { font-size:0.75rem; color:var(--gb); margin-bottom:0.8rem; letter-spacing:0.05em; }
+.impact-card-label { font-size:0.78rem; color:rgba(200,234,204,0.55); line-height:1.6; }
+.impact-badges { display:flex; gap:10px; flex-wrap:wrap; opacity:0; }
+.impact-badge { padding:0.5rem 1.1rem; border:1px solid rgba(143,212,154,0.2); border-radius:999px; font-size:0.78rem; color:var(--gl); background:rgba(143,212,154,0.05); }
+
+/* ══ FUTURE POTENTIAL ══ */
+.future-title { font-family:'Playfair Display',serif; font-size:clamp(2.2rem,4.5vw,3.8rem); line-height:1.05; margin-bottom:2.5rem; opacity:0; }
+.future-title em { font-style:italic; color:var(--gl); }
+.future-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-bottom:2.5rem; }
+.future-card { background:rgba(143,212,154,0.04); border:1px solid rgba(143,212,154,0.12); border-radius:20px; padding:2rem 1.5rem; text-align:center; opacity:0; transform:translateY(30px); transition:all 0.3s; }
+.future-card:hover { border-color:rgba(143,212,154,0.3); transform:translateY(-4px) !important; }
+.future-num { font-family:'Playfair Display',serif; font-size:3.5rem; color:var(--gl); line-height:1; margin-bottom:0.8rem; }
+.future-unit { font-size:1.8rem; color:var(--gb); }
+.future-card-label { font-size:0.82rem; color:rgba(200,234,204,0.6); line-height:1.6; }
+.future-roadmap { display:flex; align-items:flex-start; gap:0; opacity:0; }
+.future-road-item { display:flex; align-items:flex-start; gap:1rem; flex:1; }
+.future-road-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; margin-top:4px; background:rgba(143,212,154,0.2); border:2px solid rgba(143,212,154,0.3); }
+.future-road-dot.active { background:var(--gb); border-color:var(--gl); box-shadow:0 0 12px rgba(143,212,154,0.4); }
+.future-road-line { width:60px; height:1px; background:rgba(143,212,154,0.2); flex-shrink:0; margin-top:10px; }
+.future-road-phase { font-size:0.68rem; color:var(--gb); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem; }
+.future-road-title { font-size:0.9rem; font-weight:500; color:var(--cream); margin-bottom:0.3rem; }
+.future-road-desc { font-size:0.78rem; color:rgba(200,234,204,0.5); line-height:1.5; }
+
+@media(max-width:900px) {
+  .idea-layout { grid-template-columns:1fr; gap:2rem; }
+  .impact-grid,.future-grid { grid-template-columns:1fr; gap:1rem; }
+  .future-roadmap { flex-direction:column; gap:1rem; }
+  .future-road-line { width:1px; height:24px; margin:0 0 0 6px; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<canvas id="bgCanvas"></canvas>
+<div class="grain"></div>
+
+<nav id="mainNav">
+  <div class="nav-logo">
+    <span class="nav-logo-dot"></span>
+    PalmPlastic
+  </div>
+  <div class="nav-dots" id="navDots">
+    <span class="nav-dot active" data-idx="0"></span>
+    <span class="nav-dot" data-idx="1"></span>
+    <span class="nav-dot" data-idx="2"></span>
+    <span class="nav-dot" data-idx="3"></span>
+    <span class="nav-dot" data-idx="4"></span>
+    <span class="nav-dot" data-idx="5"></span>
+    <span class="nav-dot" data-idx="6"></span>
+    <span class="nav-dot" data-idx="7"></span>
+    <span class="nav-dot" data-idx="8"></span>
+    <span class="nav-dot" data-idx="9"></span>
+    <span class="nav-dot" data-idx="10"></span>
+    <span class="nav-dot" data-idx="11"></span>
+  </div>
+  <span class="nav-slide-num" id="slideNum">01 / 12</span>
+  <div class="nav-progress" id="navProgress"></div>
+</nav>
+
+<!-- ══ SLIDE 1: HERO ══ -->
+<section class="slide" id="s1" data-slide="0">
+  <div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(45,92,53,0.35),transparent 70%);top:-100px;right:-100px;animation-duration:10s;"></div>
+  <div class="orb" style="width:300px;height:300px;background:radial-gradient(circle,rgba(74,158,88,0.2),transparent 70%);bottom:50px;left:-50px;animation-duration:7s;animation-delay:-3s;"></div>
+  <div class="hero-grid-line" style="top:30%"></div>
+  <div class="hero-grid-line" style="top:60%"></div>
+  <div class="hero-grid-line" style="top:75%"></div>
+  <div class="slide-inner">
+    <p class="eyebrow">Pitch Deck · 2025 · Indonesia</p>
+    <h1 class="hero-title">
+      <span class="line"><span class="word">Palm</span></span>
+      <span class="line"><span class="word italic">Plastic</span></span>
+    </h1>
+    <p class="hero-desc">Sustainable biodegradable plastic from palm oil waste — turning Indonesia's biggest agricultural byproduct into tomorrow's packaging.</p>
+    <button class="hero-cta" onclick="goToSlide(1)">
+      Explore the deck
+      <svg class="hero-cta-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="hero-stats">
+      <div class="hero-stat-item">
+        <div class="hero-stat-num">$24B</div>
+        <div class="hero-stat-label">Global market 2025</div>
+      </div>
+      <div class="hero-stat-item">
+        <div class="hero-stat-num">80M+</div>
+        <div class="hero-stat-label">Tons EFB waste/yr</div>
+      </div>
+      <div class="hero-stat-item">
+        <div class="hero-stat-num">#1</div>
+        <div class="hero-stat-label">Palm oil producer</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 2: PROBLEM ══ -->
+<section class="slide" id="s2" data-slide="1">
+  <div class="orb" style="width:600px;height:600px;background:radial-gradient(circle,rgba(184,90,42,0.15),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:12s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label">01 — The Problem</p>
+    <h2 class="problem-headline">Indonesia's palm<br>waste crisis is <em>real.</em></h2>
+    <div class="prob-cards">
+      <div class="prob-card">
+        <span class="prob-card-icon">🌴</span>
+        <div class="prob-card-num">80M<span class="prob-card-unit">+</span></div>
+        <div style="font-size:0.82rem;color:var(--gl);opacity:0.7">tons of EFB per year</div>
+        <p class="prob-card-text">Most is burned or left to rot in fields, releasing methane and CO₂ while contaminating soil and waterways near plantations.</p>
+      </div>
+      <div class="prob-card">
+        <span class="prob-card-icon">💸</span>
+        <div class="prob-card-num">$5.78<span class="prob-card-unit">B</span></div>
+        <div style="font-size:0.82rem;color:var(--gl);opacity:0.7">plastic imports annually</div>
+        <p class="prob-card-text">Indonesia spends billions importing petroleum-based plastic every year — a dependency that grows while domestic waste accumulates.</p>
+      </div>
+      <div class="prob-card">
+        <span class="prob-card-icon">⚠️</span>
+        <div class="prob-card-num">~0<span class="prob-card-unit">%</span></div>
+        <div style="font-size:0.82rem;color:var(--gl);opacity:0.7">of EFB converted to bioplastic</div>
+        <p class="prob-card-text">The technology exists. The raw material is abundant. Yet almost zero EFB is being converted into bioplastic today. This is the gap we fill.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SLIDE: IDEATION ══ -->
+<section class="slide" id="s-ideation" data-slide="2">
+  <div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(45,92,53,0.3),transparent 70%);top:-100px;left:-100px;animation-duration:11s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label" id="idea-label">02 — Ideation</p>
+    <div class="idea-layout">
+      <div class="idea-left">
+        <h2 class="idea-title">From <em>waste</em><br>to solution.</h2>
+        <p class="idea-desc">Palm oil plantations generate enormous quantities of Empty Fruit Bunch waste after oil extraction. Instead of burning or dumping it, we saw an opportunity nobody else was taking.</p>
+      </div>
+      <div class="idea-right">
+        <div class="idea-card">
+          <div class="idea-card-icon">🌴</div>
+          <div class="idea-card-body">
+            <div class="idea-card-title">The Observation</div>
+            <p class="idea-card-text">Palm oil plantations produce massive EFB waste — most is burned or left to rot, releasing methane and damaging surrounding ecosystems.</p>
+          </div>
+        </div>
+        <div class="idea-arrow">↓</div>
+        <div class="idea-card">
+          <div class="idea-card-icon">💡</div>
+          <div class="idea-card-body">
+            <div class="idea-card-title">The Insight</div>
+            <p class="idea-card-text">EFB is rich in cellulose fiber — the same raw material used to make biodegradable plastics. What if waste became feedstock?</p>
+          </div>
+        </div>
+        <div class="idea-arrow">↓</div>
+        <div class="idea-card">
+          <div class="idea-card-icon">🚀</div>
+          <div class="idea-card-body">
+            <div class="idea-card-title">The Idea</div>
+            <p class="idea-card-text">Convert EFB into PalmPlastic — a biodegradable plastic alternative that solves two problems at once: waste and pollution.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 4: SOLUTION ══ -->
+<section class="slide" id="s3" data-slide="3">
+  <div class="orb" style="width:400px;height:400px;background:radial-gradient(circle,rgba(74,158,88,0.2),transparent 70%);top:-50px;right:10%;animation-duration:9s;"></div>
+  <div class="slide-inner">
+    <p class="sol-label">02 — Our Solution</p>
+    <h2 class="sol-title">We turn <em>palm waste</em> into biodegradable plastic pellets.</h2>
+    <div class="flow-wrap">
+      <div class="flow-connector" id="flowLine"></div>
+      <div class="flow-node">
+        <div class="flow-icon-wrap">🌴</div>
+        <h4>Collect EFB</h4>
+        <p>Source from palm oil mills</p>
+        <div class="flow-tooltip">Empty Fruit Bunches are collected directly from CPO mills — currently a waste they pay to dispose of, giving us near-zero raw material cost.</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-wrap">🧪</div>
+        <h4>Extract Cellulose</h4>
+        <p>Chemical acetylation</p>
+        <div class="flow-tooltip">EFB contains 40–50% cellulose. We extract and acetylate it to produce cellulose acetate, the bioplastic base material.</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-wrap">⚗️</div>
+        <h4>Blend Biopolymer</h4>
+        <p>Add palm glycerol</p>
+        <div class="flow-tooltip">Palm glycerol (also from palm waste) acts as a plasticizer, giving the material flexibility and durability comparable to conventional plastic.</div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-icon-wrap">🔩</div>
+        <h4>Extrude & Pelletize</h4>
+        <p>Ready-to-sell pellets</p>
+        <div class="flow-tooltip">The blend is heated, extruded, and cut into uniform pellets. These are sold B2B to packaging manufacturers who use them in their existing machines.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 4: MACHINE ══ -->
+<section class="slide" id="s-machine" data-slide="4">
+  <div class="orb" style="width:600px;height:600px;background:radial-gradient(circle,rgba(45,92,53,0.3),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:12s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label" id="mach-label">03 — The Machine</p>
+    <div class="mach-layout">
+      <div class="mach-info">
+        <h2 class="mach-title">PalmPlastic <em>Bioplastic Machine</em></h2>
+        <p class="mach-sub">Biodegradable Plastic from Palm Waste</p>
+        <div class="mach-specs">
+          <div class="mach-spec-item"><span class="mach-spec-val">250×120×180</span><span class="mach-spec-key">Dimensions (cm)</span></div>
+          <div class="mach-spec-item"><span class="mach-spec-val">40–60 kg</span><span class="mach-spec-key">Capacity / hour</span></div>
+          <div class="mach-spec-item"><span class="mach-spec-val">8 kW</span><span class="mach-spec-key">Power</span></div>
+          <div class="mach-spec-item"><span class="mach-spec-val">$50–150K</span><span class="mach-spec-key">Est. unit cost</span></div>
+        </div>
+        <div class="mach-parts-list">
+          <div class="mach-part-row" data-part="0"><span class="mach-part-dot"></span>Material Hopper</div>
+          <div class="mach-part-row" data-part="1"><span class="mach-part-dot"></span>Grinding & Cellulose Extraction</div>
+          <div class="mach-part-row" data-part="2"><span class="mach-part-dot"></span>Mixing & Heating Chamber</div>
+          <div class="mach-part-row" data-part="3"><span class="mach-part-dot"></span>Extrusion & Pelletizer</div>
+        </div>
+      </div>
+      <div class="mach-3d-wrap">
+        <canvas id="machCanvas"></canvas>
+        <div class="mach-rotate-hint" id="machHint">drag to rotate · scroll to zoom</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 5: MARKET ══ -->
+<section class="slide" id="s4" data-slide="5">
+  <div class="orb" style="width:700px;height:700px;background:radial-gradient(circle,rgba(29,51,32,0.5),transparent 70%);top:50%;right:-200px;transform:translateY(-50%);animation-duration:11s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label">03 — Market Size</p>
+    <div class="mkt-layout">
+      <div>
+        <h2 class="mkt-left-title">The market is <em>growing fast.</em></h2>
+        <div class="mkt-big-num"><span id="mktCounter">0</span><span class="unit">USD Billion</span></div>
+        <p class="mkt-big-label">Global bioplastics market 2025 — projected $100B+ by 2035</p>
+        <div class="mkt-cagr">
+          <div class="mkt-cagr-item"><div class="mkt-cagr-num">17–20%</div><div class="mkt-cagr-label">Annual CAGR</div></div>
+          <div class="mkt-cagr-item"><div class="mkt-cagr-num">1.72M T</div><div class="mkt-cagr-label">Indonesia EFB potential</div></div>
+        </div>
+      </div>
+      <div class="mkt-right">
+        <div style="font-size:0.82rem;color:rgba(143,212,154,0.5);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.8rem;">Indonesia's strategic position</div>
+        <div class="mkt-bar-group">
+          <div class="mkt-bar-title"><span>World's #1 palm oil producer</span><span>100%</span></div>
+          <div class="mkt-bar-track"><div class="mkt-bar-fill primary" data-w="100"></div></div>
+        </div>
+        <div class="mkt-bar-group">
+          <div class="mkt-bar-title"><span>EFB-to-bioplastic potential captured</span><span style="color:var(--amber)">~2%</span></div>
+          <div class="mkt-bar-track"><div class="mkt-bar-fill warn" data-w="2"></div></div>
+        </div>
+        <div class="mkt-bar-group">
+          <div class="mkt-bar-title"><span>Import substitution potential</span><span>65%</span></div>
+          <div class="mkt-bar-track"><div class="mkt-bar-fill primary" data-w="65"></div></div>
+        </div>
+        <div class="mkt-bar-group">
+          <div class="mkt-bar-title"><span>FMCG brands with sustainability targets</span><span>78%</span></div>
+          <div class="mkt-bar-track"><div class="mkt-bar-fill primary" data-w="78"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 6: COMPETITION ══ -->
+<section class="slide" id="s5" data-slide="6">
+  <div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(29,51,32,0.4),transparent 70%);bottom:-100px;left:-100px;animation-duration:13s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label">04 — Competitive Landscape</p>
+    <div class="comp-intro">
+      <h2 class="comp-main-title">We have a cost advantage nobody can <em>replicate.</em></h2>
+      <p class="comp-insight">Every competitor buys food crops as feedstock — corn, sugarcane, cassava. We use a waste product that mills currently pay to dispose of. That's a structural, not a temporary, advantage.</p>
+    </div>
+    <div class="comp-grid">
+      <div class="comp-card us">
+        <span class="advantage-badge">● PalmPlastic</span>
+        <div class="comp-name">PalmPlastic</div>
+        <div class="comp-origin">Indonesia · EFB Waste</div>
+        <p class="comp-desc">The only player converting palm EFB directly into bioplastic pellets at scale. Raw material is a waste product. Located in the world's largest palm oil nation.</p>
+        <div class="comp-attr-row">
+          <div class="comp-attr"><span class="comp-attr-key">Feedstock</span><span class="comp-attr-val">EFB waste (~$0)</span></div>
+          <div class="comp-attr"><span class="comp-attr-key">Location</span><span class="comp-attr-val">Indonesia</span></div>
+          <div class="comp-attr"><span class="comp-attr-key">Stage</span><span class="comp-attr-val">Pilot 2025</span></div>
+        </div>
+      </div>
+      <div class="comp-card other">
+        <div class="comp-name">Greenhope</div>
+        <div class="comp-origin">Indonesia · Cassava</div>
+        <p class="comp-desc">Local competitor. $5M raised. Produces Ecoplas from cassava starch. Must purchase food crops as feedstock, raising input costs vs. our waste-based model.</p>
+        <div class="comp-attr-row">
+          <div class="comp-attr"><span class="comp-attr-key">Feedstock</span><span class="comp-attr-val">Cassava (purchased)</span></div>
+          <div class="comp-attr"><span class="comp-attr-key">Funding</span><span class="comp-attr-val">$5M raised</span></div>
+          <div class="comp-attr"><span class="comp-attr-key">Stage</span><span class="comp-attr-val">Commercial</span></div>
+        </div>
+      </div>
+      <div class="comp-card other">
+        <div class="comp-name">NatureWorks</div>
+        <div class="comp-origin">USA · Corn Starch</div>
+        <p class="comp-desc">Global leader (Ingeo PLA) using corn. Dominant in Western markets but feedstock not available at scale in SE Asia. No EFB utilization. Higher cost in our region.</p>
+        <div class="comp-attr-row">
+          <div class="comp-attr"><span class="comp-attr-key">Feedstock</span><span class="comp-attr-val">Corn (expensive)</span></div>
+          <div class="comp-attr"><span class="comp-attr-key">Market</span><span class="comp-attr-val">USA / Europe</span></div>
+          <div class="comp-attr"><span class="comp-attr-key">Stage</span><span class="comp-attr-val">Global scale</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 7: BIZ MODEL ══ -->
+<section class="slide" id="s6" data-slide="7">
+  <div class="orb" style="width:600px;height:600px;background:radial-gradient(circle,rgba(45,92,53,0.25),transparent 70%);top:-150px;right:-150px;animation-duration:9s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label">05 — Business Model</p>
+    <div class="biz-header">
+      <h2 class="biz-main-title">Three streams,<br><em>one supply chain.</em></h2>
+    </div>
+    <div class="biz-cards">
+      <div class="biz-card featured">
+        <div class="biz-phase">Phase 1 · Core</div>
+        <div class="biz-name">B2B Pellet Sales</div>
+        <div class="biz-rev">$800K–1.2M</div>
+        <div class="biz-rev-label">Est. Year 2–3 revenue</div>
+        <p class="biz-desc">Sell bioplastic pellets to FMCG packaging companies. 50–100 ton/year at pilot scale. Hover for details.</p>
+        <div class="biz-hover-detail">
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">Target: FMCG brands with public sustainability commitments (Unilever, Wings, etc.)</div></div>
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">Price: ~$1,200–1,800 per ton vs. $800–1,000 for conventional (premium accepted by ESG buyers)</div></div>
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">50–100 ton/year capacity at pilot; scalable to 500+ ton with Phase 2 investment</div></div>
+        </div>
+      </div>
+      <div class="biz-card">
+        <div class="biz-phase">Phase 2 · Scale</div>
+        <div class="biz-name">Machine Licensing</div>
+        <div class="biz-rev">$200K+</div>
+        <div class="biz-rev-label">Per unit + royalties</div>
+        <p class="biz-desc">License the machine to CPO mills who want to process their own EFB. Recurring royalty per ton. Hover for details.</p>
+        <div class="biz-hover-detail">
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">CPO mills are motivated buyers — EFB disposal currently costs them money</div></div>
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">One-time machine sale + $30–50/ton royalty creates recurring revenue</div></div>
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">Indonesia has 600+ palm oil mills — large addressable market</div></div>
+        </div>
+      </div>
+      <div class="biz-card">
+        <div class="biz-phase">Phase 3 · Brand</div>
+        <div class="biz-name">Branded Products</div>
+        <div class="biz-rev">$5–20M</div>
+        <div class="biz-rev-label">Annual revenue potential</div>
+        <p class="biz-desc">Certified PalmPlastic-branded packaging sold to retailers and e-commerce. Hover for details.</p>
+        <div class="biz-hover-detail">
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">Premium certified-biodegradable packaging for e-commerce and retail</div></div>
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">Certifications: ISO 17088, ASTM D6400 target in Year 2–3</div></div>
+          <div class="biz-detail-item"><div class="biz-detail-dot"></div><div class="biz-detail-text">Export potential: regional SE Asia markets with growing eco-regulations</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 8: FINANCIALS ══ -->
+<section class="slide" id="s7" data-slide="8">
+  <div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(29,51,32,0.4),transparent 70%);bottom:-100px;right:-100px;animation-duration:10s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label">06 — Use of Funds</p>
+    <div class="fin-header">
+      <h2 class="fin-title">$400K to <em>prove the concept.</em></h2>
+    </div>
+    <div class="fin-layout">
+      <div class="fin-metrics">
+        <div class="fin-metric"><div class="fin-metric-amount">$150K</div><div class="fin-metric-label">Bioplastic Machine (1 unit)</div></div>
+        <div class="fin-metric"><div class="fin-metric-amount">$100K</div><div class="fin-metric-label">Facility & Infrastructure</div></div>
+        <div class="fin-metric"><div class="fin-metric-amount">$60K</div><div class="fin-metric-label">R&D & Formula Development</div></div>
+        <div class="fin-metric"><div class="fin-metric-amount">$50K</div><div class="fin-metric-label">Year 1 Manpower (4 people)</div></div>
+        <div class="fin-metric"><div class="fin-metric-amount">$40K</div><div class="fin-metric-label">Legal, Certifications & Buffer</div></div>
+      </div>
+      <div>
+        <div class="fin-alloc">
+          <div class="fin-alloc-title">Allocation breakdown</div>
+          <div class="fin-alloc-row"><div class="fin-alloc-head"><span class="fin-alloc-name">Machine</span><span class="fin-alloc-pct">37.5%</span></div><div class="fin-alloc-track"><div class="fin-alloc-bar" data-w="37.5"></div></div></div>
+          <div class="fin-alloc-row"><div class="fin-alloc-head"><span class="fin-alloc-name">Facility</span><span class="fin-alloc-pct">25%</span></div><div class="fin-alloc-track"><div class="fin-alloc-bar" data-w="25"></div></div></div>
+          <div class="fin-alloc-row"><div class="fin-alloc-head"><span class="fin-alloc-name">R&D</span><span class="fin-alloc-pct">15%</span></div><div class="fin-alloc-track"><div class="fin-alloc-bar" data-w="15"></div></div></div>
+          <div class="fin-alloc-row"><div class="fin-alloc-head"><span class="fin-alloc-name">Manpower</span><span class="fin-alloc-pct">12.5%</span></div><div class="fin-alloc-track"><div class="fin-alloc-bar" data-w="12.5"></div></div></div>
+          <div class="fin-alloc-row"><div class="fin-alloc-head"><span class="fin-alloc-name">Legal & Buffer</span><span class="fin-alloc-pct">10%</span></div><div class="fin-alloc-track"><div class="fin-alloc-bar" data-w="10"></div></div></div>
+        </div>
+        <div class="fin-timeline">
+          <div class="fin-phase"><div class="fin-phase-label">Phase 1</div><div class="fin-phase-name">Pilot (0–18 mo)</div><div class="fin-phase-cost">$400K</div></div>
+          <div class="fin-phase"><div class="fin-phase-label">Phase 2</div><div class="fin-phase-name">Scale (18–36 mo)</div><div class="fin-phase-cost">+$1–2M</div></div>
+          <div class="fin-phase"><div class="fin-phase-label">Phase 3</div><div class="fin-phase-name">Commercial (3–5 yr)</div><div class="fin-phase-cost">+$5M+</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SLIDE: IMPACT ══ -->
+<section class="slide" id="s-impact" data-slide="9">
+  <div class="orb" style="width:600px;height:600px;background:radial-gradient(circle,rgba(74,158,88,0.2),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:13s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label" id="impact-label">08 — Environmental Impact</p>
+    <h2 class="impact-title">Real impact on<br>the <em>environment.</em></h2>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <div class="impact-icon">🌿</div>
+        <div class="impact-num" data-count="80">0</div>
+        <div class="impact-unit">M+ tons</div>
+        <div class="impact-card-label">EFB waste redirected from burning & landfill annually</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon">♻️</div>
+        <div class="impact-num" data-count="100">0</div>
+        <div class="impact-unit">% biodegradable</div>
+        <div class="impact-card-label">Fully breaks down in natural environments, no microplastics</div>
+      </div>
+      <div class="impact-card">
+        <div class="impact-icon">🌍</div>
+        <div class="impact-num" data-count="60">0</div>
+        <div class="impact-unit">% less CO₂</div>
+        <div class="impact-card-label">Carbon footprint vs conventional petroleum-based plastic</div>
+      </div>
+    </div>
+    <div class="impact-badges">
+      <span class="impact-badge">♻ Reduced Waste</span>
+      <span class="impact-badge">🌿 Reduced Pollution</span>
+      <span class="impact-badge">🌍 Sustainable Production</span>
+      <span class="impact-badge">💧 Cleaner Waterways</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE: FUTURE POTENTIAL ══ -->
+<section class="slide" id="s-future" data-slide="10">
+  <div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,rgba(45,92,53,0.3),transparent 70%);top:-100px;right:-100px;animation-duration:10s;"></div>
+  <div class="slide-inner">
+    <p class="sec-label" id="future-label">09 — Future Potential</p>
+    <h2 class="future-title">The opportunity<br>is <em>just beginning.</em></h2>
+    <div class="future-grid">
+      <div class="future-card">
+        <div class="future-num">600<span class="future-unit">+</span></div>
+        <div class="future-card-label">Palm oil mills in Indonesia — each a potential machine licensing customer</div>
+      </div>
+      <div class="future-card">
+        <div class="future-num">$100<span class="future-unit">B</span></div>
+        <div class="future-card-label">Projected global bioplastics market by 2035 — we're entering early</div>
+      </div>
+      <div class="future-card">
+        <div class="future-num">SE<span class="future-unit"> Asia</span></div>
+        <div class="future-card-label">Entire region shares the same palm waste problem — scalable across borders</div>
+      </div>
+    </div>
+    <div class="future-roadmap">
+      <div class="future-road-item">
+        <div class="future-road-dot active"></div>
+        <div class="future-road-content">
+          <div class="future-road-phase">2025 — Now</div>
+          <div class="future-road-title">Pilot Production</div>
+          <div class="future-road-desc">Proof of concept, first B2B offtakers, $400K seed</div>
+        </div>
+      </div>
+      <div class="future-road-line"></div>
+      <div class="future-road-item">
+        <div class="future-road-dot"></div>
+        <div class="future-road-content">
+          <div class="future-road-phase">2026–2027</div>
+          <div class="future-road-title">Scale Up</div>
+          <div class="future-road-desc">3–5 machines, 500+ ton/yr, machine licensing launch</div>
+        </div>
+      </div>
+      <div class="future-road-line"></div>
+      <div class="future-road-item">
+        <div class="future-road-dot"></div>
+        <div class="future-road-content">
+          <div class="future-road-phase">2028+</div>
+          <div class="future-road-title">Regional Expansion</div>
+          <div class="future-road-desc">SE Asia rollout, branded packaging, $5–20M revenue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SLIDE 12: CLOSE ══ -->
+<section class="slide" id="s8" data-slide="11">
+  <div class="orb" style="width:800px;height:800px;background:radial-gradient(circle,rgba(45,92,53,0.25),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:14s;"></div>
+  <div class="close-wrap">
+    <p class="close-tag">The Future is Biodegradable</p>
+    <h2 class="close-title">
+      <span class="line"><span class="word">Turning waste</span></span>
+      <span class="line"><span class="word green">into value.</span></span>
+    </h2>
+    <p class="close-sub">Indonesia produces more palm waste than any country on Earth. We're building the technology to turn that into a sustainable materials business — starting today.</p>
+    <div class="close-badges">
+      <span class="close-badge">Biodegradable Plastic</span>
+      <span class="close-badge">B2B Pellet Sales</span>
+      <span class="close-badge">EFB Feedstock</span>
+      <span class="close-badge">$400K Seed Round</span>
+      <span class="close-badge">Indonesia · SE Asia</span>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script>
+// ── CUSTOM CURSOR ─────────────────────────────────────────────────────
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+});
+
+function lerpCursor() {
+  rx += (mx - rx) * 0.1; ry += (my - ry) * 0.1;
+  ring.style.left = Math.round(rx) + 'px'; ring.style.top = Math.round(ry) + 'px';
+  requestAnimationFrame(lerpCursor);
+}
+lerpCursor();
+
+document.querySelectorAll('button,[onclick],.nav-dot,.biz-card,.comp-card,.flow-node,.close-badge,.fin-phase').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.width = '20px'; cur.style.height = '20px'; ring.style.width = '60px'; ring.style.height = '60px'; });
+  el.addEventListener('mouseleave', () => { cur.style.width = '12px'; cur.style.height = '12px'; ring.style.width = '40px'; ring.style.height = '40px'; });
+});
+
+// ── ANIMATED BLOB + PARTICLE BACKGROUND ──────────────────────────────
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+let mouse = { x: -999, y: -999 };
+let t = 0;
+
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+// ── BLOBS ──
+const blobs = [
+  { x: 0.2, y: 0.25, r: 0.38, hue: 130, speed: 0.00035, ox: 0, oy: 0, phase: 0 },
+  { x: 0.75, y: 0.6,  r: 0.32, hue: 150, speed: 0.00028, ox: 0, oy: 0, phase: 2.1 },
+  { x: 0.5,  y: 0.9,  r: 0.28, hue: 115, speed: 0.00042, ox: 0, oy: 0, phase: 4.2 },
+  { x: 0.85, y: 0.15, r: 0.22, hue: 160, speed: 0.00055, ox: 0, oy: 0, phase: 1.0 },
+  { x: 0.1,  y: 0.75, r: 0.20, hue: 140, speed: 0.00038, ox: 0, oy: 0, phase: 3.3 },
+];
+
+// ── FIREFLY PARTICLES ──
+class Firefly {
+  constructor() { this.reset(true); }
+  reset(init = false) {
+    this.x = Math.random() * W;
+    this.y = init ? Math.random() * H : H + 10;
+    this.size = Math.random() * 2.2 + 0.4;
+    this.speedY = -(Math.random() * 0.5 + 0.15);
+    this.speedX = (Math.random() - 0.5) * 0.35;
+    this.life = 0;
+    this.maxLife = Math.random() * 280 + 180;
+    this.opacity = init ? Math.random() * 0.5 : 0;
+    this.hue = 115 + Math.random() * 50;
+    this.twinkle = Math.random() * Math.PI * 2;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.life++;
+    this.twinkle += 0.04;
+    // subtle mouse repel
+    const dx = mouse.x - this.x, dy = mouse.y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 150) { this.x -= dx / dist * 0.5; this.y -= dy / dist * 0.5; }
+    const twinkleOp = 0.5 + Math.sin(this.twinkle) * 0.3;
+    if (this.life < 40) this.opacity = (this.life / 40) * 0.6 * twinkleOp;
+    else if (this.life > this.maxLife - 40) this.opacity = ((this.maxLife - this.life) / 40) * 0.6 * twinkleOp;
+    else this.opacity = 0.6 * twinkleOp;
+    if (this.life >= this.maxLife || this.y < -10 || this.x < -10 || this.x > W + 10) this.reset();
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    // glow
+    const grd = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 4);
+    grd.addColorStop(0, `hsla(${this.hue},80%,75%,1)`);
+    grd.addColorStop(1, `hsla(${this.hue},80%,75%,0)`);
+    ctx.fillStyle = grd;
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 4, 0, Math.PI * 2); ctx.fill();
+    // core
+    ctx.globalAlpha = Math.min(this.opacity * 1.5, 1);
+    ctx.fillStyle = `hsl(${this.hue},90%,85%)`;
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+}
+
+// ── CONSTELLATION LINES ──
+function drawConstellations(flies) {
+  for (let i = 0; i < flies.length; i++) {
+    for (let j = i + 1; j < flies.length; j++) {
+      const dx = flies[i].x - flies[j].x, dy = flies[i].y - flies[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 110) {
+        ctx.save();
+        ctx.globalAlpha = (1 - d / 110) * 0.12;
+        ctx.strokeStyle = `hsl(135,60%,65%)`;
+        ctx.lineWidth = 0.6;
+        ctx.beginPath(); ctx.moveTo(flies[i].x, flies[i].y); ctx.lineTo(flies[j].x, flies[j].y); ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+}
+
+// ── MORPHING BLOB path using sin waves ──
+function drawBlob(cx, cy, baseR, time, hue, phase) {
+  const points = 8;
+  ctx.beginPath();
+  for (let i = 0; i <= points; i++) {
+    const angle = (i / points) * Math.PI * 2;
+    const wobble =
+      Math.sin(angle * 2 + time * 1.1 + phase) * 0.18 +
+      Math.sin(angle * 3 - time * 0.7 + phase) * 0.10 +
+      Math.sin(angle * 5 + time * 0.5 + phase) * 0.06;
+    const r = baseR * (1 + wobble);
+    const x = cx + Math.cos(angle) * r;
+    const y = cy + Math.sin(angle) * r;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+
+  const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR * 1.2);
+  grd.addColorStop(0, `hsla(${hue},70%,52%,0.22)`);
+  grd.addColorStop(0.5, `hsla(${hue},65%,45%,0.14)`);
+  grd.addColorStop(1, `hsla(${hue},60%,40%,0)`);
+  ctx.fillStyle = grd;
+  ctx.fill();
+}
+
+const flies = Array.from({ length: 80 }, () => new Firefly());
+
+function animFrame() {
+  ctx.clearRect(0, 0, W, H);
+  t += 0.012;
+
+  // draw blobs first (background layer)
+  blobs.forEach(b => {
+    b.ox += (Math.sin(t * b.speed * 3000 + b.phase) * 0.06 - b.ox) * 0.008;
+    b.oy += (Math.cos(t * b.speed * 2000 + b.phase) * 0.05 - b.oy) * 0.008;
+    const cx = (b.x + b.ox) * W;
+    const cy = (b.y + b.oy) * H;
+    const r = b.r * Math.min(W, H);
+    drawBlob(cx, cy, r, t, b.hue, b.phase);
+  });
+
+  // mouse blob — follows cursor
+  if (mouse.x > 0) {
+    drawBlob(mouse.x, mouse.y, Math.min(W, H) * 0.18, t * 1.5, 145, 0);
+  }
+
+  // fireflies + constellations
+  ctx.save();
+  drawConstellations(flies);
+  ctx.restore();
+  flies.forEach(f => { f.update(); f.draw(); });
+
+  requestAnimationFrame(animFrame);
+}
+animFrame();
+
+// ── INTERSECTION OBSERVER & NAV ───────────────────────────────────────
+const slides = document.querySelectorAll('.slide');
+const navDots = document.querySelectorAll('.nav-dot');
+const slideNum = document.getElementById('slideNum');
+const navProgress = document.getElementById('navProgress');
+let animated = new Set();
+let current = 0;
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = parseInt(e.target.dataset.slide);
+      current = idx;
+      navDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      slideNum.textContent = String(idx + 1).padStart(2, '0') + ' / 12';
+      navProgress.style.width = ((idx + 1) / 12 * 100) + '%';
+      if (!animated.has(idx)) { animated.add(idx); triggerAnim(idx); }
+    }
+  });
+}, { threshold: 0.35 });
+
+slides.forEach(s => observer.observe(s));
+
+function goToSlide(i) { slides[i].scrollIntoView({ behavior: 'smooth' }); }
+navDots.forEach(d => d.addEventListener('click', () => goToSlide(parseInt(d.dataset.idx))));
+
+// ── THREE.JS MACHINE ──────────────────────────────────────────────────
+function initMachine() {
+  const canvas = document.getElementById('machCanvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+
+  const W = canvas.clientWidth || 520;
+  const H = canvas.clientHeight || 380;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(W, H, false);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+  camera.position.set(4.5, 2.8, 5.5);
+  camera.lookAt(0, 0, 0);
+
+  scene.add(new THREE.AmbientLight(0x88ccaa, 0.7));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+  sun.position.set(5,8,6); sun.castShadow=true; scene.add(sun);
+  const fill = new THREE.DirectionalLight(0x4a9e58, 0.4);
+  fill.position.set(-4,2,-3); scene.add(fill);
+  const rim = new THREE.PointLight(0x8fd49a, 0.6, 12);
+  rim.position.set(-3,4,2); scene.add(rim);
+
+  const matSteel  = new THREE.MeshStandardMaterial({ color:0x8aaa90, metalness:0.8, roughness:0.25 });
+  const matBase   = new THREE.MeshStandardMaterial({ color:0x2a4a30, metalness:0.5, roughness:0.5 });
+  const matMotor  = new THREE.MeshStandardMaterial({ color:0x1a55cc, metalness:0.7, roughness:0.3 });
+  const matHopper = new THREE.MeshStandardMaterial({ color:0x9ab09e, metalness:0.6, roughness:0.3 });
+  const matCtrl   = new THREE.MeshStandardMaterial({ color:0x2a3a2a, metalness:0.4, roughness:0.6 });
+  const matPellet = new THREE.MeshStandardMaterial({ color:0x90d99a, metalness:0.1, roughness:0.8 });
+  const matGlow   = new THREE.MeshStandardMaterial({ color:0x8fd49a, emissive:0x4a9e58, emissiveIntensity:0.9, metalness:0.3, roughness:0.3 });
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const hopperM=[], motorM=[], tubeM=[], ctrlM=[];
+
+  function box(w,h,d,mat,x,y,z) {
+    const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+    m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true;
+    group.add(m); return m;
+  }
+  function cyl(rt,rb,h,seg,mat,x,y,z,rx=0,ry=0,rz=0) {
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),mat);
+    m.position.set(x,y,z); m.rotation.set(rx,ry,rz);
+    m.castShadow=true; m.receiveShadow=true;
+    group.add(m); return m;
+  }
+
+  // Base platform
+  box(4.2,0.18,1.1,matBase,0,-0.6,0);
+  [-1.9,1.9].forEach(x=>[-0.4,0.4].forEach(z=>cyl(0.07,0.09,0.3,8,matBase,x,-0.82,z)));
+
+  // Main body block
+  box(3.2,0.7,0.95,matSteel,-0.3,-0.16,0);
+
+  // Extruder tube
+  tubeM.push(cyl(0.22,0.22,1.8,24,matSteel,0.2,0.2,0,0,0,Math.PI/2));
+  cyl(0.22,0.18,0.08,24,matSteel,1.12,0.2,0,0,0,Math.PI/2);
+  [-0.3,0.2,0.7].forEach(x=>cyl(0.25,0.25,0.06,24,matBase,x,0.2,0,0,0,Math.PI/2));
+
+  // Motor (blue)
+  motorM.push(box(0.55,0.55,0.55,matMotor,-1.35,0.1,0));
+  cyl(0.06,0.06,0.35,12,matSteel,-1.05,0.1,0,0,0,Math.PI/2);
+  [0.12,0.04,-0.04,-0.12].forEach(z=>box(0.55,0.04,0.04,matMotor,-1.35,0.38,z));
+
+  // Hopper (funnel)
+  const hTop=cyl(0.38,0.18,0.42,4,matHopper,-1.2,1.06,0);
+  const hBot=cyl(0.18,0.28,0.35,4,matHopper,-1.2,0.7,0);
+  hTop.rotation.y=Math.PI/4; hBot.rotation.y=Math.PI/4;
+  hopperM.push(hTop,hBot);
+  cyl(0.4,0.4,0.04,4,matBase,-1.2,1.29,0,0,Math.PI/4,0);
+  cyl(0.05,0.05,0.5,8,matSteel,-1.2,0.42,0);
+
+  // Pressure gauges
+  cyl(0.1,0.1,0.05,16,matCtrl,-0.6,0.42,0.5);
+  cyl(0.1,0.1,0.05,16,matCtrl,-0.3,0.42,0.5);
+  const matScreen=new THREE.MeshStandardMaterial({color:0xddffdd});
+  cyl(0.08,0.08,0.02,16,matScreen,-0.6,0.43,0.53);
+  cyl(0.08,0.08,0.02,16,matScreen,-0.3,0.43,0.53);
+
+  // Control box
+  ctrlM.push(box(0.5,0.75,0.6,matCtrl,1.05,0.1,0));
+  box(0.22,0.18,0.02,new THREE.MeshStandardMaterial({color:0x00cc66,emissive:0x00cc66,emissiveIntensity:0.5}),1.05,0.2,0.31);
+  [[1.05,0.02],[1.14,-0.08],[0.96,-0.08]].forEach(([x,y],i)=>{
+    const c=[0xff3333,0xffcc00,0x33ff66][i];
+    cyl(0.03,0.03,0.02,12,new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:0.3}),x,y,0.31);
+  });
+
+  // Conveyor
+  const cg=new THREE.Group(); cg.rotation.z=-0.22; cg.position.set(1.55,-0.05,0); group.add(cg);
+  const cm=new THREE.Mesh(new THREE.BoxGeometry(0.85,0.1,0.55),matCtrl); cm.castShadow=true; cg.add(cm);
+  for(let i=0;i<6;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(0.85,0.02,0.08),new THREE.MeshStandardMaterial({color:0x445544}));s.position.z=-0.2+i*0.08;cg.add(s);}
+
+  // Pellet bin + pellets
+  box(0.55,0.5,0.55,new THREE.MeshStandardMaterial({color:0x1a3220,metalness:0.4,roughness:0.6,transparent:true,opacity:0.85}),2.15,-0.38,0);
+  for(let i=0;i<14;i++) cyl(0.04,0.04,0.07,8,matPellet,2.05+Math.random()*0.2,-0.28+Math.random()*0.15,-0.15+Math.random()*0.3);
+
+  // Extra pipe
+  cyl(0.04,0.04,0.3,8,matSteel,0.8,0.05,0.45,Math.PI/3,0,0);
+
+  // Floor shadow plane
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.MeshStandardMaterial({color:0x0a1a0c,transparent:true,opacity:0.4,roughness:1}));
+  fl.rotation.x=-Math.PI/2; fl.position.y=-0.72; fl.receiveShadow=true; scene.add(fl);
+
+  // Highlight parts on hover
+  const partGroups=[hopperM, motorM, tubeM, ctrlM];
+  const origMats=[matHopper, matMotor, matSteel, matCtrl];
+  let hlIdx=-1;
+
+  function highlight(idx) {
+    if(hlIdx===idx) return;
+    partGroups.forEach((g,i)=>g.forEach(m=>m.material=i===idx?matGlow:origMats[i]));
+    hlIdx=idx;
+  }
+  function resetHL() {
+    partGroups.forEach((g,i)=>g.forEach(m=>m.material=origMats[i]));
+    hlIdx=-1;
+  }
+
+  document.querySelectorAll('.mach-part-row').forEach(row=>{
+    row.addEventListener('mouseenter',()=>{
+      document.querySelectorAll('.mach-part-row').forEach(r=>r.classList.remove('active'));
+      row.classList.add('active');
+      highlight(parseInt(row.dataset.part));
+    });
+    row.addEventListener('mouseleave',()=>{ row.classList.remove('active'); resetHL(); });
+  });
+
+  // Drag orbit
+  let rotY=0.3, rotX=0.25, drag=false, px=0, py=0, autoSpin=true, autoT;
+  group.rotation.y=rotY; group.rotation.x=rotX;
+
+  canvas.addEventListener('mousedown',e=>{drag=true;px=e.clientX;py=e.clientY;autoSpin=false;clearTimeout(autoT);});
+  document.addEventListener('mousemove',e=>{
+    if(!drag)return;
+    rotY+=(e.clientX-px)*0.008; rotX+=(e.clientY-py)*0.005;
+    rotX=Math.max(-0.6,Math.min(0.7,rotX));
+    group.rotation.y=rotY; group.rotation.x=rotX; px=e.clientX; py=e.clientY;
+  });
+  document.addEventListener('mouseup',()=>{drag=false;autoT=setTimeout(()=>autoSpin=true,2200);});
+  canvas.addEventListener('wheel',e=>{camera.position.multiplyScalar(e.deltaY>0?1.08:0.93);camera.position.clampLength(3,12);},{passive:true});
+  canvas.addEventListener('touchstart',e=>{autoSpin=false;clearTimeout(autoT);px=e.touches[0].clientX;py=e.touches[0].clientY;},{passive:true});
+  canvas.addEventListener('touchmove',e=>{
+    rotY+=(e.touches[0].clientX-px)*0.008; rotX+=(e.touches[0].clientY-py)*0.005;
+    rotX=Math.max(-0.6,Math.min(0.7,rotX));
+    group.rotation.y=rotY; group.rotation.x=rotX; px=e.touches[0].clientX; py=e.touches[0].clientY;
+  },{passive:true});
+  canvas.addEventListener('touchend',()=>{autoT=setTimeout(()=>autoSpin=true,2200);});
+
+  window.addEventListener('resize',()=>{
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+  });
+
+  (function render(){
+    requestAnimationFrame(render);
+    if(autoSpin){rotY+=0.004;group.rotation.y=rotY;}
+    renderer.render(scene,camera);
+  })();
+}
+
+let machineInited = false;
+// ── SLIDE ANIMATIONS ──────────────────────────────────────────────────
+function triggerAnim(i) {
+  const t = (delay, targets, props) => anime({ targets, easing: 'easeOutExpo', delay, ...props });
+
+  switch (i) {
+    case 0:
+      t(0,'.eyebrow',{opacity:[0,1],translateY:[15,0],duration:700});
+      anime({targets:'.hero-title .word',translateY:['115%','0%'],duration:1000,delay:anime.stagger(120,{start:200}),easing:'easeOutExpo'});
+      t(600,'.hero-desc',{opacity:[0,1],translateY:[20,0],duration:700});
+      t(850,'.hero-cta',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(1000,'.hero-stats',{opacity:[0,1],translateX:[30,0],duration:700});
+      break;
+    case 1:
+      t(0,'#s2 .sec-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.problem-headline',{opacity:[0,1],translateY:[30,0],duration:800});
+      anime({targets:'.prob-card',opacity:[0,1],translateY:[50,0],duration:700,delay:anime.stagger(130,{start:600}),easing:'easeOutCubic'});
+      break;
+    case 2:
+      t(0,'#idea-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.idea-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      t(500,'.idea-desc',{opacity:[0,1],translateY:[20,0],duration:600});
+      t(400,'.idea-right',{opacity:[0,1],translateX:[30,0],duration:700});
+      break;
+    case 3:
+      t(0,'.sol-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.sol-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      anime({targets:'.flow-node',opacity:[0,1],translateY:[30,0],duration:600,delay:anime.stagger(120,{start:600}),easing:'easeOutCubic'});
+      setTimeout(()=>anime({targets:'#flowLine',opacity:[0,1],scaleX:[0,1],duration:1000,easing:'easeOutExpo'}),900);
+      break;
+    case 4:
+      t(0,'#mach-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.mach-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      t(450,'.mach-sub',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(600,'.mach-specs',{opacity:[0,1],translateY:[20,0],duration:700});
+      t(800,'.mach-parts-list',{opacity:[0,1],translateX:[-20,0],duration:600});
+      t(500,'.mach-3d-wrap',{opacity:[0,1],scale:[0.9,1],duration:800,easing:'easeOutBack'});
+      if(!machineInited){machineInited=true;setTimeout(initMachine,600);}
+      break;
+    case 5:
+      t(0,'#s4 .sec-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.mkt-left-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      setTimeout(()=>{
+        anime({targets:{val:0},val:24,round:1,duration:1500,easing:'easeOutCubic',
+          update:a=>{document.getElementById('mktCounter').textContent=Math.round(a.animations[0].currentValue);}});
+        t(0,'.mkt-big-num',{opacity:[0,1],translateY:[20,0],duration:700});
+      },400);
+      t(600,'.mkt-big-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(700,'.mkt-cagr',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(500,'.mkt-right',{opacity:[0,1],translateX:[30,0],duration:700,complete:()=>{
+        document.querySelectorAll('.mkt-bar-fill').forEach(b=>anime({targets:b,width:[0,b.dataset.w+'%'],duration:1200,easing:'easeOutCubic'}));
+      }});
+      break;
+    case 6:
+      t(0,'#s5 .sec-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.comp-main-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      t(400,'.comp-insight',{opacity:[0,1],translateY:[20,0],duration:700});
+      anime({targets:'.comp-card',opacity:[0,1],translateY:[40,0],duration:700,delay:anime.stagger(150,{start:600}),easing:'easeOutCubic'});
+      break;
+    case 7:
+      t(0,'#s6 .sec-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.biz-main-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      anime({targets:'.biz-card',opacity:[0,1],translateY:[50,0],duration:700,delay:anime.stagger(150,{start:600}),easing:'easeOutCubic'});
+      break;
+    case 8:
+      t(0,'#s7 .sec-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.fin-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      anime({targets:'.fin-metric',opacity:[0,1],translateX:[-30,0],duration:600,delay:anime.stagger(100,{start:500}),easing:'easeOutCubic'});
+      setTimeout(()=>{
+        anime({targets:'.fin-alloc',opacity:[0,1],translateX:[30,0],duration:700,easing:'easeOutCubic',complete:()=>{
+          document.querySelectorAll('.fin-alloc-bar').forEach(b=>anime({targets:b,width:[0,b.dataset.w+'%'],duration:1000,easing:'easeOutCubic'}));
+        }});
+        t(400,'.fin-timeline',{opacity:[0,1],translateY:[20,0],duration:600});
+      },600);
+      break;
+    case 9:
+      t(0,'#impact-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.impact-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      anime({targets:'.impact-card',opacity:[0,1],translateY:[40,0],duration:700,
+        delay:anime.stagger(120,{start:500}),easing:'easeOutCubic',
+        complete:()=>{
+          document.querySelectorAll('.impact-num').forEach(el=>{
+            const target=parseInt(el.dataset.count);
+            anime({targets:{val:0},val:target,round:1,duration:1500,easing:'easeOutCubic',
+              update:a=>{el.textContent=Math.round(a.animations[0].currentValue);}});
+          });
+        }
+      });
+      t(1200,'.impact-badges',{opacity:[0,1],translateY:[15,0],duration:600});
+      break;
+    case 10:
+      t(0,'#future-label',{opacity:[0,1],translateY:[15,0],duration:600});
+      t(200,'.future-title',{opacity:[0,1],translateY:[30,0],duration:800});
+      anime({targets:'.future-card',opacity:[0,1],translateY:[30,0],duration:600,delay:anime.stagger(130,{start:500}),easing:'easeOutCubic'});
+      t(900,'.future-roadmap',{opacity:[0,1],translateY:[20,0],duration:700});
+      break;
+    case 11:
+      t(0,'.close-tag',{opacity:[0,1],duration:600});
+      anime({targets:'.close-title .word',translateY:['115%','0%'],duration:1000,delay:anime.stagger(150,{start:300}),easing:'easeOutExpo'});
+      t(700,'.close-sub',{opacity:[0,1],translateY:[20,0],duration:700});
+      anime({targets:'.close-badge',opacity:[0,1],translateY:[15,0],duration:500,delay:anime.stagger(80,{start:900}),easing:'easeOutCubic'});
+      break;
+  }
+}
+
+</script>
+</body>
+</html>
