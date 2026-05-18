@@ -262,11 +262,10 @@
   }
 
   /* ── TECHNOLOGY ── */
-  .tech-grid { display:grid; grid-template-columns:7fr 5fr; gap:24px; margin-top:40px; }
-  @media(max-width:1024px){ .tech-grid{ grid-template-columns:1fr; } }
+  .tech-grid { display:grid; grid-template-columns:1fr; gap:24px; margin-top:40px; }
 
   .machine-viewer {
-    position:relative; min-height:520px; overflow:hidden;
+    position:relative; min-height:860px; overflow:hidden;
     background: rgba(255,255,255,0.06);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -280,8 +279,8 @@
     background: radial-gradient(ellipse at 30% 10%, rgba(255,255,255,0.35) 0%, transparent 55%);
   }
   .machine-viewer img {
-    width:100%; height:100%; object-fit:contain; padding:32px;
-    position:absolute; inset:0; opacity:0.92;
+    width:96%; height:96%; object-fit:contain; padding:0;
+    position:absolute; inset:2%; opacity:0.92;
   }
   /* annotation nodes */
   .ann-node { position:absolute; z-index:10; display:flex; flex-direction:column; align-items:center; }
@@ -510,24 +509,6 @@
         <img src="PalmPlasticDrawingVer1.1.png" alt="PalmPlastic Machine Illustration" />
     </div>
 
-      <!-- Right panel -->
-      <div class="tech-right">
-
-        <!-- Specs from drawing -->
-        <div class="glass specs-card fade-in">
-          <div style="font-size:10px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:var(--green-bright);margin-bottom:20px;">
-            Specifications
-          </div>
-          <div class="spec-row"><span class="spec-key">Dimensions (L×W×H)</span><span class="spec-val">250×120×120 cm</span></div>
-          <div class="spec-row"><span class="spec-key">Installed Power</span><span class="spec-val">15–22 kW</span></div>
-          <div class="spec-row"><span class="spec-key">Machine Weight</span><span class="spec-val">600–800 kg</span></div>
-          <div class="spec-row"><span class="spec-key">Output</span><span class="spec-val">40–60 kg/hr</span></div>
-          <div class="spec-row"><span class="spec-key">Power Source</span><span class="spec-val">380–415V 3-phase</span></div>
-          <div class="spec-row"><span class="spec-key">Construction</span><span class="spec-val">Stainless Steel 304</span></div>
-          <div class="spec-row"><span class="spec-key">Control System</span><span class="spec-val">PLC + HMI Touch</span></div>
-        </div>
-
-      </div>
     </div>
   </div>
 </section>
@@ -645,7 +626,7 @@
 <footer>
   <div class="footer-brand">
     <span class="footer-legal">Legal Entity</span>
-    <span class="footer-name">© 2025 PalmPlastic Industrial.</span>
+    <span class="footer-name">© 2026 PalmPlastic Industrial.</span>
   </div>
   <div class="footer-links">
     <div class="footer-link"><span class="footer-link-label">Archives</span><span class="footer-link-val">Vol. I</span></div>
